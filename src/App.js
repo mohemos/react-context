@@ -1,35 +1,19 @@
-import React from 'react';
-import './style.css';
-import { useTabContent } from './utils/hooks';
-import Team from './components/team';
-import Fixture from './components/fixture';
+import React, { useContext } from 'react';
+import Header from './components/header';
+import Footer from './components/footer';
+import Body from './components/body';
+import {GlobalContext} from './utils/context';
 
 function App() {
-  const TabContent = useTabContent();
+  const {config} = useContext(GlobalContext);
 
-  if (!TabContent.content)
-    TabContent.display(<Fixture TabContent={TabContent} />);
+  console.log(config);
 
-  return (
-    <div id="container">
-      <ul className="tabContainer">
-        <li
-          onClick={() =>
-            TabContent.display(<Fixture TabContent={TabContent} />)
-          }
-        >
-          Fixtures
-        </li>
-        <li
-          onClick={() => TabContent.display(<Team TabContent={TabContent} />)}
-        >
-          Teams
-        </li>
-      </ul>
-
-      <div>{TabContent.content}</div>
-    </div>
-  );
+  return <div>
+      {config.showHeader && <Header />}
+       <Body />
+      {config.showFooter && <Footer />}
+  </div>
 }
 
 export default App;
