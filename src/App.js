@@ -1,19 +1,16 @@
-import React, { useContext } from 'react';
-import Header from './components/header';
-import Footer from './components/footer';
-import Body from './components/body';
-import {GlobalContext} from './utils/context';
+import React from 'react';
+import { formatTime } from './utils';
+import {useTimer} from './utils/hooks';
 
-function App() {
-  const {config} = useContext(GlobalContext);
+export default ()=>{
+  const {resume,pause,start,timer,isPaused} = useTimer(10);
 
-  console.log(config);
+  const {seconds, minutes, hours, days} = formatTime(timer);
 
   return <div>
-      {config.showHeader && <Header />}
-       <Body />
-      {config.showFooter && <Footer />}
+    {seconds} : {minutes} : {hours} : {days}
+    <button onClick={()=>start()}>Start</button>
+    <button onClick={()=>pause()}>pause</button>
+    <button onClick={()=>resume()}>Resume</button>
   </div>
 }
-
-export default App;
