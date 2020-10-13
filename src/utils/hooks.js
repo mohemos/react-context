@@ -58,26 +58,31 @@ export function useForm(submitAction) {
 }
 
 
-export function useTimer(initDuration){
+export function useTimer(initDuration,cb){
   const countUpRef = useRef(null);
   const countDownRef = useRef(null);
   const [timer,setTimer] = useState(0);
   const [isPaused,setIsPaused] = useState(false);
   const [duration,setDuration] = useState(0);
+  const [timeUp,setTimeUp] = useState(false);
 
   const start = ()=>{
     initDuration = Date.now() + (1000*60*initDuration);
-    setTimer(initDuration - Date.now());
     setDuration(initDuration);
-
+    setTimer(initDuration - Date.now());
     countDownRef.current = countDown();
-    console.log("====Count down ref",countDownRef.current);
   }
 
   function countDown(){
     return setInterval(() => {
-      setTimer((timer) => timer - 1000)
-      console.log("========Counting Down")
+      setTimer((timer) => {
+        if(timer === 0){
+          cb();
+          clearInterval(countDownRef.current);
+        } else if(timer > 0){
+          return timer - 1000
+        } else return 0;
+      });
     }, 1000);
   }
 
@@ -106,15 +111,20 @@ export function useTimer(initDuration){
   }
 
   const formatTime = (distance) => {
-    const days = "0"+(Math.floor(distance / (1000 * 60 * 60 * 24)))+"".slice(-2);
-    const hours = `0${Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))}`.slice(-2);
-    const minutes = `0${Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))}`.slice(-2);
-    const seconds = `0${Math.floor((distance % (1000 * 60)) / 1000)}`.slice(-2);
+    const days = format((Math.floor(distance / (1000 * 60 * 60 * 24))));
+    const hours = format(Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+    const minutes = format(Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)));
+    const seconds = format(Math.floor((distance % (1000 * 60)) / 1000));
   
     return {seconds, minutes, hours, days}
   }
 
+  function format(time){
+    if(!time) return "00";
+    return `0${time}`.slice(-2);
+  }
+
   return {
-    pause, start, resume, timer
+    pause, start, resume, timer, formatTime
   }
 }
